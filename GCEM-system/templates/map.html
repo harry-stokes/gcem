@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GCEMnavERA – Your smart campus navigation assistant for Gopalan College of Engineering and Management. Find shortest paths between campus locations.">
+  <title>GCEMnavERA – Campus Navigator | GCEM</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ===== CSS RESET & VARIABLES ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary:        #1a56db;
+      --primary-light:  #3b82f6;
+      --primary-dark:   #1e3a8a;
+      --accent:         #f59e0b;
+      --accent-light:   #fbbf24;
+      --success:        #10b981;
+      --danger:         #ef4444;
+
+      --bg:             #f1f5f9;
+      --surface:        #ffffff;
+      --surface-2:      #f8fafc;
+      --border:         #e2e8f0;
+      --border-strong:  #cbd5e1;
+
+      --text-primary:   #0f172a;
+      --text-secondary: #475569;
+      --text-muted:     #94a3b8;
+
+      --nav-h:          72px;
+      --radius-sm:      8px;
+      --radius-md:      14px;
+      --radius-lg:      20px;
+      --radius-xl:      28px;
+
+      --shadow-sm:      0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md:      0 4px 16px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+      --shadow-lg:      0 10px 40px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.05);
+      --shadow-xl:      0 20px 60px rgba(0,0,0,.12), 0 4px 16px rgba(0,0,0,.06);
+      --shadow-blue:    0 8px 30px rgba(26, 86, 219, .25);
+
+      --transition:     all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== HEADER / NAVBAR ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: var(--nav-h);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    header.scrolled {
+      box-shadow: var(--shadow-md);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 100%;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* Brand */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-blue);
+      transition: var(--transition);
+    }
+
+    .brand-icon i {
+      color: white;
+      font-size: 18px;
+    }
+
+    .nav-brand:hover .brand-icon {
+      transform: scale(1.08) rotate(-3deg);
+      box-shadow: 0 10px 35px rgba(26, 86, 219, .35);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      line-height: 1.1;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Nav Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-links a i {
+      font-size: 13px;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    .nav-links a:hover i {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .nav-links a.active {
+      background: #eff6ff;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Tour Button */
+    .btn-tour {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: var(--primary);
+      color: white !important;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      box-shadow: var(--shadow-blue);
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-tour:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 35px rgba(26, 86, 219, .35);
+      color: white !important;
+    }
+
+    .btn-tour i {
+      font-size: 13px;
+      opacity: 1 !important;
+    }
+
+    /* ===== HERO STRIP ===== */
+    .hero-strip {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #2563eb 100%);
+      color: white;
+      padding: 40px 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-strip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .hero-strip::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--bg);
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-badge i {
+      color: var(--accent-light);
+    }
+
+    .hero-strip h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-strip p {
+      font-size: 15px;
+      opacity: 0.85;
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .main-layout {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 28px 60px;
+    }
+
+    /* Section Titles */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-icon i {
+      color: var(--primary);
+      font-size: 16px;
+    }
+
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ===== MAP CARD ===== */
+    .map-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 36px;
+      transition: var(--transition-slow);
+    }
+
+    .map-card:hover {
+      box-shadow: var(--shadow-xl);
+    }
+
+    .map-card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+    }
+
+    .map-card-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .map-card-title i {
+      color: var(--primary);
+    }
+
+    .map-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #dcfce7;
+      color: #16a34a;
+      border-radius: 50px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .map-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .map-wrapper {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .map-wrapper:hover img {
+      transform: scale(1.01);
+    }
+
+    /* ===== NAVIGATION FORM CARD ===== */
+    .nav-form-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 36px;
+      transition: var(--transition-slow);
+    }
+
+    .nav-form-card:hover {
+      box-shadow: var(--shadow-xl);
+    }
+
+    .nav-form-header {
+      padding: 24px 32px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-form-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-blue);
+      flex-shrink: 0;
+    }
+
+    .nav-form-icon i {
+      color: white;
+      font-size: 20px;
+    }
+
+    .nav-form-header-text h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .nav-form-header-text p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .nav-form-body {
+      padding: 32px;
+    }
+
+    /* Algorithm Selector */
+    .algo-pills {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .algo-pill {
+      flex: 1;
+      min-width: 130px;
+      position: relative;
+    }
+
+    .algo-pill input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .algo-pill label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--surface);
+      text-align: center;
+      user-select: none;
+    }
+
+    .algo-pill label i {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .algo-pill label:hover {
+      border-color: var(--primary-light);
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .algo-pill input[type="radio"]:checked + label {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-blue);
+    }
+
+    .algo-pill input[type="radio"]:checked + label i {
+      opacity: 1;
+    }
+
+    /* Form Row */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 0;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-field label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-field label i {
+      color: var(--primary);
+      font-size: 11px;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 11px;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .form-field select {
+      width: 100%;
+      height: 50px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0 40px 0 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .form-field select:hover {
+      border-color: var(--primary-light);
+    }
+
+    .form-field select:focus {
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+
+    /* Swap Arrow */
+    .swap-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+    }
+
+    .swap-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .swap-icon:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #eff6ff;
+      transform: rotate(180deg);
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.2px;
+    }
+
+    .submit-btn i {
+      font-size: 15px;
+      transition: var(--transition);
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(26, 86, 219, .35);
+    }
+
+    .submit-btn:hover i {
+      transform: translateX(4px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0px);
+    }
+
+    /* ===== RESULT CARD ===== */
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 36px;
+      animation: slideInUp 0.4s ease;
+    }
+
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .result-header-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--success);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      flex-shrink: 0;
+    }
+
+    .result-header-icon i {
+      color: white;
+      font-size: 16px;
+    }
+
+    .result-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .result-header p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .result-body {
+      padding: 28px;
+    }
+
+    .result-pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 20px 24px;
+      border-radius: var(--radius-md);
+      font-family: 'Courier New', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin-bottom: 20px;
+      border: 1px solid #1e293b;
+    }
+
+    .osm-link-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-md);
+    }
+
+    .osm-link-wrap i {
+      color: var(--primary);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .osm-link-wrap a {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 500;
+      word-break: break-all;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .osm-link-wrap a:hover {
+      text-decoration: underline;
+      color: var(--primary-dark);
+    }
+
+    /* ===== CHATBOT FAB ===== */
+    .chatbot-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(26, 86, 219, 0.45);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .chatbot-fab:hover {
+      transform: scale(1.12) translateY(-2px);
+      box-shadow: 0 10px 35px rgba(26, 86, 219, 0.55);
+    }
+
+    .chatbot-fab::after {
+      content: 'Need Help?';
+      position: absolute;
+      right: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--text-primary);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .chatbot-fab:hover::after {
+      opacity: 1;
+    }
+
+    /* ===== CHATBOT POPUP ===== */
+    .chatbot-popup {
+      display: none;
+      position: fixed;
+      bottom: 100px;
+      right: 28px;
+      width: 400px;
+      height: 540px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      animation: popupIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popupIn {
+      from { opacity: 0; transform: scale(0.85) translateY(20px); transform-origin: bottom right; }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .chatbot-popup-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chatbot-popup-title {
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chatbot-popup-title i {
+      font-size: 16px;
+    }
+
+    .chatbot-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: var(--transition);
+    }
+
+    .chatbot-close-btn:hover {
+      background: rgba(255,255,255,0.35);
+      transform: rotate(90deg);
+    }
+
+    .chatbot-body {
+      width: 100%;
+      height: calc(100% - 58px);
+      border: none;
+    }
+
+    /* ===== CAMPUS TOUR MODAL ===== */
+    .tour-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .tour-modal.open {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .tour-modal-content {
+      background: white;
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 920px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      position: relative;
+      animation: slideInUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .tour-modal-header {
+      padding: 28px 32px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .tour-modal-header h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .tour-modal-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .tour-close-btn {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .tour-close-btn:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .tour-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      padding: 28px 32px;
+    }
+
+    .tour-card {
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      transition: var(--transition-slow);
+      background: var(--surface);
+    }
+
+    .tour-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: #bfdbfe;
+    }
+
+    .tour-card img {
+      width: 100%;
+      height: 195px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .tour-card:hover img {
+      transform: scale(1.04);
+    }
+
+    .tour-card-body {
+      padding: 18px;
+    }
+
+    .tour-card-body h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .tour-card-body p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .tour-card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .tour-card-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--text-primary);
+      color: white;
+      padding: 40px 28px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .footer-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-logo-icon i {
+      color: white;
+      font-size: 18px;
+    }
+
+    .footer-logo-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .footer-tagline {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    .footer-divider {
+      border: none;
+      border-top: 1px solid #1e293b;
+      margin: 20px 0;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .social-links a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1e293b;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .social-links a:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* ===== SCROLL PROGRESS ===== */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+      z-index: 2000;
+      transition: width 0.1s linear;
+      border-radius: 0 3px 3px 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .swap-btn {
+        transform: rotate(90deg);
+        margin: 8px 0;
+        justify-content: flex-start;
+      }
+      .tour-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links { display: none; }
+      .main-layout { padding: 24px 16px 50px; }
+      .nav-form-body { padding: 20px; }
+      .tour-grid { padding: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .algo-pills { flex-direction: column; }
+      .algo-pill { min-width: unset; }
+      .chatbot-popup { width: calc(100vw - 32px); right: 16px; }
+    }
+
+    /* ===== HIDDEN select (actual form value) ===== */
+    #choice-hidden { display: none; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header id="main-header">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <div class="brand-icon" style="background: none; box-shadow: none; display: flex; align-items: center; justify-content: center; padding: 0;">
+          <img src="{{ url_for('static', filename='gcem_logo.jpg') }}" alt="GCEM Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">GCEMnavERA</span>
+          <span class="brand-sub">Campus Navigator</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="https://www.gopalancolleges.com/" target="_blank" id="nav-about"><i class="fas fa-university"></i> About GCEM</a></li>
+        <li><a href="https://www.gopalancolleges.com/gcem/contact.html" target="_blank" id="nav-contact"><i class="fas fa-phone"></i> Contact</a></li>
+        <li><a href="#nav-section" id="nav-navigate"><i class="fas fa-route" ></i> Navigate</a></li>
+      </ul>
+
+      <button class="btn-tour" onclick="openTourModal()" id="btn-tour">
+        <i class="fas fa-images"></i> Campus Tour
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== HERO STRIP ===== -->
+  <section class="hero-strip">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-map-marked-alt"></i>
+        Smart Campus Navigation
+      </div>
+      <h1>Gopalan College of Engineering<br>and Management</h1>
+      <p>Explore the campus, discover facilities, and find the smartest routes between any two locations.</p>
+    </div>
+  </section>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-layout">
+
+    <!-- Map Section -->
+    <div class="section-header">
+      <div class="section-icon"><i class="fas fa-map"></i></div>
+      <div>
+        <div class="section-title">Interactive Campus Map</div>
+        <div class="section-subtitle">Click on any location to explore details</div>
+      </div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-header">
+        <span class="map-card-title"><i class="fas fa-location-dot"></i> GCEM Campus, Bangalore</span>
+        <span class="map-badge">Interactive</span>
+      </div>
+      <div class="map-wrapper">
+        <img src="{{ url_for('static', filename='MAP.jpg') }}" alt="GCEM Campus Map" usemap="#campusmap">
+                <map name="campusmap">
+          <area shape="rect" coords="413,122,442,198" title="Gate no. 2" href="http://127.0.0.1:5000/gate2">
+          <area shape="rect" coords="484,16,655,117" title="GCEM Bus Stop" href="http://127.0.0.1:5000/geubs">
+          <area shape="rect" coords="511,175,626,261" title="Parking" href="http://127.0.0.1:5000/Parking">
+          <area shape="rect" coords="703,65,786,114" title="Chanakya Block" href="http://127.0.0.1:5000/chanakya">
+          <area shape="rect" coords="808,161,889,206" title="Petroleum Block" href="http://127.0.0.1:5000/Petroleum">
+          <area shape="rect" coords="675,185,732,284" title="K.P Nautiyal" href="http://127.0.0.1:5000/kpblock">
+          <area shape="rect" coords="743,206,779,285" title="Quick Bite Cafe" href="http://127.0.0.1:5000/qbc">
+          <area shape="rect" coords="627,296,873,352" title="Mechanical Block" href="http://127.0.0.1:5000/mech">
+          <area shape="rect" coords="659,373,777,440" title="Girls Hostel" href="http://127.0.0.1:5000/girlshostel">
+          <area shape="circle" coords="968,164,50" title="Param Lab" href="http://127.0.0.1:5000/param">
+          <area shape="circle" coords="1015,281,50" title="Aryabhatt Lab" href="http://127.0.0.1:5000/aryabhatt">
+          <area shape="rect" coords="1048,154,1133,202" title="GCEM Library" href="http://127.0.0.1:5000/santosh">
+          <area shape="rect" coords="1168,268,1257,318" title="B Tech Block (Main Building)" href="http://127.0.0.1:5000/btech">
+          <area shape="rect" coords="1229,121,1309,166" title="Civil Block" href="http://127.0.0.1:5000/civil">
+          <area shape="rect" coords="1285,188,1374,247" title="Badminton Court" href="http://127.0.0.1:5000/badminton">
+          <area shape="circle" coords="1338,299,50" title="Cafe and Gym" href="http://127.0.0.1:5000/cafe">
+          <area shape="rect" coords="1314,341,1388,395" title="Ravi Canteen" href="http://127.0.0.1:5000/ravi">
+          <area shape="rect" coords="1315,466,1392,555" title="Boys Hostel" href="http://127.0.0.1:5000/boys">
+          <area shape="rect" coords="1224,634,1310,678" title="CS/IT Block" href="http://127.0.0.1:5000/csit">
+          <area shape="rect" coords="912,433,987,538" title="Tuck Shop" href="http://127.0.0.1:5000/tuck">
+          <area shape="rect" coords="997,547,1069,578" title="Gate 1" href="http://127.0.0.1:5000/gate1">
+          <area shape="rect" coords="811,630,991,697" title="Convention Centre" href="http://127.0.0.1:5000/convention">
+          <area shape="rect" coords="125,345,229,564" title="Marina Girls Hostel" href="http://127.0.0.1:5000/marina">
+          <area shape="rect" coords="22,660,166,888" title="GCEM" href="http://127.0.0.1:5000/gehu">
+        </map>
+      </div>
+    </div>
+
+    <!-- Path Finder Section -->
+    <div class="section-header" id="nav-section">
+      <div class="section-icon"><i class="fas fa-route"></i></div>
+      <div>
+        <div class="section-title">Smart Path Finder</div>
+        <div class="section-subtitle">Choose an algorithm and find the optimal route</div>
+      </div>
+    </div>
+
+    <div class="nav-form-card">
+      <div class="nav-form-header">
+        <div class="nav-form-icon"><i class="fas fa-route"></i></div>
+        <div class="nav-form-header-text">
+          <h2>Find Shortest Path</h2>
+          <p>Select source, destination and preferred algorithm</p>
+        </div>
+      </div>
+
+      <div class="nav-form-body">
+        <form action="/find_path" method="post" id="path-form">
+          <!-- Hidden actual select for algorithm -->
+          <select name="choice" id="choice-hidden">
+            <option value="1">Dijkstra</option>
+            <option value="2">A Star</option>
+            <option value="3">Floyd Warshall</option>
+            <option value="4">Comparison</option>
+          </select>
+
+          <!-- Visual Algorithm Pills -->
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+              <i class="fas fa-microchip" style="color:var(--primary);font-size:11px;"></i> Algorithm
+            </label>
+            <div class="algo-pills">
+              <div class="algo-pill">
+                <input type="radio" name="algo_visual" id="algo1" value="1" checked onchange="setAlgo(this.value)">
+                <label for="algo1"><i class="fas fa-network-wired"></i> Dijkstra</label>
+              </div>
+              <div class="algo-pill">
+                <input type="radio" name="algo_visual" id="algo2" value="2" onchange="setAlgo(this.value)">
+                <label for="algo2"><i class="fas fa-star"></i> A* Star</label>
+              </div>
+              <div class="algo-pill">
+                <input type="radio" name="algo_visual" id="algo3" value="3" onchange="setAlgo(this.value)">
+                <label for="algo3"><i class="fas fa-table-cells"></i> Floyd-Warshall</label>
+              </div>
+              <div class="algo-pill">
+                <input type="radio" name="algo_visual" id="algo4" value="4" onchange="setAlgo(this.value)">
+                <label for="algo4"><i class="fas fa-chart-bar"></i> Compare All</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Source / Destination -->
+          <div class="form-row">
+            <div class="form-field">
+              <label for="source"><i class="fas fa-circle-dot"></i> Source Location</label>
+              <div class="select-wrapper">
+                <select name="source" id="source" required>
+                  <option value="csit">CSIT Block</option>
+                  <option value="badminton">Badminton Court</option>
+                  <option value="btech">B.Tech Block</option>
+                  <option value="library">GCEM Library</option>
+                  <option value="civil">Civil Block</option>
+                  <option value="param">Param Block</option>
+                  <option value="aryabhatt">Aryabhatt Lab</option>
+                  <option value="petroleum">Petroleum Block</option>
+                  <option value="chanakya">Chanakya Block</option>
+                  <option value="kp">K.P Nautiyal Block</option>
+                  <option value="girlshostel">Girl's Hostel</option>
+                  <option value="cafe">Café &amp; Gym</option>
+                  <option value="busstop">GCEM Bus Stop</option>
+                  <option value="tuckshop">Tuck Shop</option>
+                  <option value="hospital">GCEM Hospital</option>
+                  <option value="vishwakarma">Vishwakarma Block</option>
+                  <option value="gate1">Gate No 1</option>
+                  <option value="quickbite">Quick Bite</option>
+                  <option value="parking">Parking</option>
+                  <option value="gate2 busstop">Bus Stop Gate 2</option>
+                  <option value="gate2">Gate No 2</option>
+                  <option value="boyshostel">Boy's Hostel</option>
+                  <option value="char khamba">Char Khamba</option>
+                  <option value="marina">Marina Hostel</option>
+                  <option value="gehu ground">GCEM Ground</option>
+                  <option value="gehu">GCEM</option>
+                  <option value="ravi canteen">Ravi Canteen</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="swap-btn">
+              <div class="swap-icon" onclick="swapLocations()" title="Swap source &amp; destination">
+                <i class="fas fa-arrow-right-arrow-left"></i>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="destination"><i class="fas fa-location-dot"></i> Destination</label>
+              <div class="select-wrapper">
+                <select name="destination" id="destination" required>
+                  <option value="csit">CSIT Block</option>
+                  <option value="badminton">Badminton Court</option>
+                  <option value="btech">B.Tech Block</option>
+                  <option value="library">GCEM Library</option>
+                  <option value="civil">Civil Block</option>
+                  <option value="param">Param Block</option>
+                  <option value="aryabhatt">Aryabhatt Lab</option>
+                  <option value="petroleum">Petroleum Block</option>
+                  <option value="chanakya">Chanakya Block</option>
+                  <option value="kp">K.P Nautiyal Block</option>
+                  <option value="priyadrashani">Priyadrashani Hostel</option>
+                  <option value="cafe">Café &amp; Gym</option>
+                  <option value="busstop">GCEM Bus Stop</option>
+                  <option value="tuckshop">Tuck Shop</option>
+                  <option value="hospital">GCEM Hospital</option>
+                  <option value="vishwakarma">Vishwakarma Block</option>
+                  <option value="gate1">Gate No 1</option>
+                  <option value="quickbite">Quick Bite</option>
+                  <option value="parking">Parking</option>
+                  <option value="gate2 busstop">Bus Stop Gate 2</option>
+                  <option value="gate2">Gate No 2</option>
+                  <option value="lakshmi bai">Lakshmi Bai Hostel</option>
+                  <option value="char khamba">Char Khamba</option>
+                  <option value="marina">Marina Hostel</option>
+                  <option value="gehu ground">GCEM Ground</option>
+                  <option value="gehu">GCEM</option>
+                  <option value="ravi canteen">Ravi Canteen</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="find-path-btn">
+            <i class="fas fa-route"></i>
+            Find Shortest Path
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    {% if result %}
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-header-icon"><i class="fas fa-check"></i></div>
+        <div>
+          <h3>Path Found Successfully</h3>
+          <p>Shortest route calculated and ready to view</p>
+        </div>
+      </div>
+      <div class="result-body">
+                <pre class="result-pre">{{ result }}</pre>
+        {% if osm_link %}
+        <div class="osm-link-wrap">
+          <i class="fas fa-external-link-alt"></i>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:4px;">View on OpenStreetMap</div>
+            <a href="{{ osm_link }}" target="_blank">{{ osm_link }}</a>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+    {% endif %}
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="footer-logo-icon" style="background: none; display: flex; align-items: center; justify-content: center; padding: 0;"><img src="{{ url_for('static', filename='gcem_logo.jpg') }}" alt="GCEM Logo" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;"></div>
+        <span class="footer-logo-text">GCEMnavERA</span>
+      </div>
+      <p class="footer-tagline">Gopalan College of Engineering and Management &nbsp;·&nbsp; Approved by AICTE &nbsp;·&nbsp; Affiliated to VTU</p>
+      <hr class="footer-divider">
+      <p class="footer-copy">© 2024 GCEMnavERA. Built for smarter campus experiences.</p>
+    </div>
+  </footer>
+
+  <!-- ===== CAMPUS TOUR MODAL ===== -->
+  <div id="tourModal" class="tour-modal" onclick="handleModalOverlayClick(event)">
+    <div class="tour-modal-content" id="tour-modal-content">
+      <div class="tour-modal-header">
+        <h2><i class="fas fa-camera" style="color:var(--primary);margin-right:10px;"></i>GCEM Campus Virtual Tour</h2>
+        <p>Explore Gopalan College of Engineering and Management</p>
+        <button class="tour-close-btn" onclick="closeTourModal()" aria-label="Close tour modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="tour-grid">
+        <div class="tour-card">
+          <img src="{{ url_for('static', filename='tour1.jpg') }}" alt="GCEM Main Block">
+          <div class="tour-card-body">
+            <h4>Main Block &amp; Research Centre</h4>
+            <p>The iconic entrance representing Gopalan College of Engineering and Management (GCEM).</p>
+          </div>
+        </div>
+        <div class="tour-card">
+          <img src="{{ url_for('static', filename='tour2.jpg') }}" alt="School of Architecture">
+          <div class="tour-card-body">
+            <h4>School of Architecture &amp; Planning</h4>
+            <p>Modern academic block designed for creative space planning and state-of-the-art laboratory work.</p>
+          </div>
+        </div>
+        <div class="tour-card">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <iframe src="https://www.youtube.com/embed/g86g69paazM" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen title="Campus Tour Video 1"></iframe>
+          </div>
+          <div class="tour-card-body">
+            <h4>Campus Tour Video 1</h4>
+            <p>A complete HD virtual tour showcasing campus infrastructure and classrooms.</p>
+            <a href="https://www.youtube.com/watch?v=g86g69paazM&t=1s" target="_blank" class="tour-card-btn">
+              <i class="fab fa-youtube"></i> Watch on YouTube
+            </a>
+          </div>
+        </div>
+        <div class="tour-card">
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+            <iframe src="https://www.youtube.com/embed/b7Bk1ukyFOg" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen title="Campus Tour Video 2"></iframe>
+          </div>
+          <div class="tour-card-body">
+            <h4>Campus Tour Video 2</h4>
+            <p>Detailed highlights of laboratories, events, and student life at GCEM.</p>
+            <a href="https://www.youtube.com/watch?v=b7Bk1ukyFOg" target="_blank" class="tour-card-btn">
+              <i class="fab fa-youtube"></i> Watch on YouTube
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== SCROLL PROGRESS BAR =====
+    const progress = document.getElementById('scroll-progress');
+    const header = document.getElementById('main-header');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = document.documentElement.scrollTop;
+      const docH = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      progress.style.width = (scrollTop / docH * 100) + '%';
+
+      if (scrollTop > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    }, { passive: true });
+
+    // ===== ALGORITHM SYNC =====
+    function setAlgo(val) {
+      document.getElementById('choice-hidden').value = val;
+    }
+
+    // ===== SWAP LOCATIONS =====
+    function swapLocations() {
+      const src = document.getElementById('source');
+      const dst = document.getElementById('destination');
+      const tmp = src.value;
+      src.value = dst.value;
+      dst.value = tmp;
+
+      // Animate the swap icon
+      const icon = document.querySelector('.swap-icon');
+      icon.style.transform = 'rotate(180deg)';
+      setTimeout(() => { icon.style.transform = ''; }, 400);
+    }
+
+
+
+    // ===== TOUR MODAL =====
+    function openTourModal() {
+      const modal = document.getElementById('tourModal');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTourModal() {
+      document.getElementById('tourModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleModalOverlayClick(e) {
+      if (e.target === document.getElementById('tourModal')) {
+        closeTourModal();
+      }
+    }
+
+    // ===== SUBMIT BUTTON LOADING STATE =====
+    document.getElementById('path-form').addEventListener('submit', function() {
+      const btn = document.getElementById('find-path-btn');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+      btn.style.opacity = '0.85';
+      btn.style.cursor = 'wait';
+    });
+
+    // ===== SMOOTH SCROLL FOR NAV LINK =====
+    document.getElementById('nav-navigate').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('nav-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // ===== MAP TOOLTIP ENHANCEMENT =====
+    // Show tooltip area titles visually on desktop
+    const mapAreas = document.querySelectorAll('map area');
+    mapAreas.forEach(area => {
+      area.addEventListener('mouseenter', () => {
+        document.title = area.title + ' – GCEMnavERA';
+      });
+      area.addEventListener('mouseleave', () => {
+        document.title = 'GCEMnavERA – Campus Navigator | GCEM';
+      });
+    });
+
+    // ===== SCROLL REVEAL ANIMATION =====
+    const revealTargets = document.querySelectorAll('.map-card, .nav-form-card, .result-card, .section-header');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    revealTargets.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
