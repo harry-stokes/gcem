@@ -160,11 +160,11 @@ graph TD
 ### 1. Compile the C Backend (Optional)
 
 > [!NOTE]
-> A pre-compiled `integrated.exe` is already included in the `GCEM system` folder. You only need to recompile the backend if you make modifications to the `integrated.c` source code.
+> A pre-compiled `integrated.exe` is already included in the `GCEM-system` folder. You only need to recompile the backend if you make modifications to the `integrated.c` source code.
 
 To compile the C source code into an optimized executable:
 ```bash
-gcc -O3 GCEM\ system/integrated.c -o GCEM\ system/integrated.exe
+gcc -O3 GCEM-system/integrated.c -o GCEM-system/integrated.exe
 ```
 *(On Windows, you can compile with GCC from MinGW or MSVC cl.exe).*
 
@@ -172,7 +172,7 @@ gcc -O3 GCEM\ system/integrated.c -o GCEM\ system/integrated.exe
 ### 2. Set Up the Virtual Environment & Dependencies
 Navigate to the system directory and set up Python:
 ```bash
-cd "GCEM system"
+cd GCEM-system
 
 # Create a virtual environment
 python -m venv venv
